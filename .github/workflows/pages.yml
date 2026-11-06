@@ -1,0 +1,25 @@
+# main の中身をそのまま gh-pages に置き、GitHub Pages で配信する。
+# gh-pages ブランチができると Pages は自動で有効になる。ならなければ
+# Settings → Pages → Source: Deploy from a branch → gh-pages / (root) を 1 回だけ選ぶ。
+name: pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: gh-pages に置く
+        run: git push -f origin HEAD:refs/heads/gh-pages
