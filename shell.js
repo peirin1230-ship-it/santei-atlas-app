@@ -74,7 +74,7 @@
   /* ---------- 画面（ホーム画面への追加・設定・読み込み中・失敗） ---------- */
   function frame(...kids) {
     root.replaceChildren(h('div', { class: 'panel' },
-      h('div', { class: 'brand' }, h('img', { src: 'icon-180.png', alt: '', width: 64, height: 64 }), h('div', null, h('h1', null, NAME), h('p', null, TAGLINE))),
+      h('div', { class: 'brand' }, h('p', { class: 'cap' }, '照会票　医科・DPC　急性期'), h('h1', null, '算定', h('em', null, 'アトラス')), h('p', null, NAME + '　' + TAGLINE)),
       kids));
   }
   function loading(text) {
@@ -181,7 +181,7 @@
       '<meta name="apple-mobile-web-app-status-bar-style" content="default">',
       `<meta name="apple-mobile-web-app-title" content="${NAME}">`,
       '<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">',
-      '<meta name="theme-color" content="#141b22" media="(prefers-color-scheme: dark)">',
+      '<meta name="theme-color" content="#111a15" media="(prefers-color-scheme: dark)">',
       '<style>body{margin:0}</style>',
     ].join('\n');
   }
@@ -198,7 +198,7 @@ const pres = [...document.querySelectorAll('pre.mermaid')];
 if (pres.length) {
   try {
     const { default: mermaid } = await import(${JSON.stringify(MERMAID)});
-    mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });
+    mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'neutral' });
     await mermaid.run({ nodes: pres, suppressErrors: true });
   } catch (e) { /* 図が描けなくても本文は読める（通信がないときなど） */ }
 }
@@ -238,14 +238,15 @@ if (pres.length) {
       if (!bar) {
         bar = document.createElement('div');
         bar.setAttribute('role', 'status');
-        bar.style.cssText = 'position:fixed;left:12px;right:12px;margin:0 auto;width:fit-content;max-width:560px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:50;display:flex;gap:12px;align-items:center;padding:10px 14px;border-radius:10px;background:#17202a;color:#fff;font-size:14px;box-shadow:0 10px 30px -12px rgba(0,0,0,.5)';
+        const low = matchMedia('(min-width: 1024px)').matches ? '16px' : 'calc(env(safe-area-inset-bottom, 0px) + 76px)';
+        bar.style.cssText = 'position:fixed;left:12px;right:12px;margin:0 auto;width:fit-content;max-width:560px;bottom:' + low + ';z-index:50;display:flex;gap:12px;align-items:center;padding:10px 14px;background:var(--ink);color:var(--sheet);border:2px solid var(--ink);font-size:14px;font-weight:700';
         document.body.append(bar);
       }
       bar.replaceChildren(document.createTextNode(text));
       if (action) {
         const b = document.createElement('button');
         b.type = 'button'; b.textContent = action.label; b.onclick = action.run;
-        b.style.cssText = 'border:0;border-radius:6px;padding:6px 12px;background:#4fc4bb;color:#0d1217;font:inherit;font-weight:700;cursor:pointer;white-space:nowrap';
+        b.style.cssText = 'border:0;padding:6px 12px;background:var(--mark);color:var(--mark-ink);font:inherit;font-weight:700;cursor:pointer;white-space:nowrap';
         bar.append(b);
       }
       bar.hidden = false;
