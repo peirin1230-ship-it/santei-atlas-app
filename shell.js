@@ -195,7 +195,7 @@
     const json = JSON.stringify(cfg).replace(/</g, '\\u003c');
     const mermaid = `<script type="module">
 const pres = [...document.querySelectorAll('pre.mermaid')];
-if (pres.length) {
+if (pres.length && !document.documentElement.dataset.lazyMermaid) { // 新しい版のページは、ひらいたページの図だけを自分で描く
   try {
     const { default: mermaid } = await import(${JSON.stringify(MERMAID)});
     mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'neutral' });
