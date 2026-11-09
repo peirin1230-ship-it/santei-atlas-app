@@ -233,6 +233,19 @@ if (pres.length && !document.documentElement.dataset.lazyMermaid) { // 新しい
       put(sha, text);
       return text;
     }
+    /* PDF など文字でないファイル：Blob のまま取り、中身の sha ごとにとっておく */
+    async function blobFile(sha, type) {
+      try { const c = await caches.open(cfg.cache); const r = await c.match(cfg.cachePrefix + sha); if (r) return await r.blob(); } catch (e) { /* 取りにいく */ }
+      let res;
+      try { res = await fetch(`${base}/git/blobs/${sha}`, { headers: H({ Accept: 'application/vnd.github.raw+json' }), cache: 'no-store' }); }
+      catch (e) { throw new Error('通信できませんでした。電波のあるところでもう一度押してください'); }
+      if (res.status === 401) throw new Error('トークンが無効になっています。「トークンを貼り直す」から貼り直してください');
+      if (!res.ok) throw new Error(`読み込めませんでした（${res.status}）`);
+      const raw = await res.blob();
+      const b = new Blob([raw], { type: type || raw.type || 'application/octet-stream' });
+      try { const c = await caches.open(cfg.cache); await c.put(cfg.cachePrefix + sha, new Response(b, { headers: { 'Content-Type': b.type } })); } catch (e) { /* 次も取りにいくだけ */ }
+      return b;
+    }
     let bar = null;
     function say(text, action) {
       if (!bar) {
@@ -277,6 +290,11 @@ if (pres.length && !document.documentElement.dataset.lazyMermaid) { // 新しい
         const sha = cfg.meta.files['data/' + name];
         if (!sha) return Promise.reject(new Error(`${name} が site ブランチにありません`));
         return blob(sha).then(JSON.parse);
+      },
+      file: name => {
+        const sha = cfg.meta.files['data/' + name];
+        if (!sha) return Promise.reject(new Error(`${name} がまだありません（新しい版が出たら「ひらき直す」）`));
+        return blobFile(sha, /\.pdf$/i.test(name) ? 'application/pdf' : '');
       },
       info: () => ({ generated: cfg.meta.generated }),
       check,

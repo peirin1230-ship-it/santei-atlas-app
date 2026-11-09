@@ -1,6 +1,6 @@
 /* 入れ物のファイルを手元に置いておき、電波がないときでもアプリをひらけるようにする。
    ひらくときは手元の版をすぐに出し、裏で新しい版を取っておく（次にひらいたときに新しくなる）。電波が弱くても待たない。santei-atlas から読んだページとデータは shell.js が別に持つ。 */
-const CACHE = 'santei-atlas-app-shell-v3';
+const CACHE = 'santei-atlas-app-shell-v4';
 const FILES = [
   './', './index.html', './shell.js', './shell.css', './manifest.webmanifest',
   './icon.svg', './icon-180.png', './icon-192.png', './icon-512.png', './icon-maskable-512.png',
